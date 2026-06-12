@@ -1,0 +1,2 @@
+# StudyBuddy-AI
+Educational Website
