@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StudyBuddy AI</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js" defer></script>
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <div id="homeScreen" class="home-screen">
+      <header class="home-nav">
+        <div class="brand">
+          <div class="brand-mark">SB</div>
+          <div>
+            <strong>StudyBuddy AI</strong>
+            <span>Lecture intelligence workspace</span>
+          </div>
+        </div>
+        <div class="home-actions">
+          <button id="homeSigninBtn" class="secondary-button" type="button">Sign in</button>
+          <button id="homeSignupBtn" class="primary-button" type="button">Get started</button>
+        </div>
+      </header>
+
+      <main class="hero">
+        <section class="hero-copy">
+          <p class="eyebrow">Private AI for every learner</p>
+          <h1>Your lectures become summaries, quizzes, flashcards, answers, and a study plan.</h1>
+          <p>
+            Upload PDFs, Word files, PowerPoint decks, TXT notes, or images, then ask StudyBuddy to revise them with you. Each user gets a separate password-protected study library on this device.
+          </p>
+          <div class="hero-buttons">
+            <button id="heroSignupBtn" class="primary-button large" type="button">Create account</button>
+            <button id="heroDemoBtn" class="secondary-button large" type="button">Try demo</button>
+          </div>
+        </section>
+
+        <section class="hero-console" aria-label="StudyBuddy feature preview">
+          <div class="console-top">
+            <span></span><span></span><span></span>
+          </div>
+          <div class="orbit-card card-one">Summary ready in bullets</div>
+          <div class="orbit-card card-two">Voice answer from lecture</div>
+          <div class="orbit-card card-three">7 day study plan</div>
+          <div class="console-panel">
+            <p class="eyebrow">Active lecture</p>
+            <h2>Computer Networks</h2>
+            <div class="signal-bars"><span></span><span></span><span></span><span></span></div>
+            <p>Ask: "Why is TCP reliable?"</p>
+            <strong>Answer found from your uploaded notes.</strong>
+          </div>
+        </section>
+      </main>
+
+      <section class="feature-strip">
+        <article><strong>Lecture summaries</strong><span>Exam-ready points from uploaded notes.</span></article>
+        <article><strong>Quizzes</strong><span>MCQs with scoring and explanations.</span></article>
+        <article><strong>Flashcards</strong><span>Active recall cards from key terms.</span></article>
+        <article><strong>Voice Ask</strong><span>Speak a question and hear the answer.</span></article>
+      </section>
+    </div>
+
+    <div id="authScreen" class="auth-screen hidden">
+      <section class="auth-art">
+        <div class="brand">
+          <div class="brand-mark">SB</div>
+          <div>
+            <strong>StudyBuddy AI</strong>
+            <span>Personal study dashboard</span>
+          </div>
+        </div>
+        <h1>First, tell StudyBuddy who is studying.</h1>
+        <p>Your name, course, semester, goal, and password protect your personal dashboard on this device. No backend account is created in this demo.</p>
+      </section>
+
+      <section class="auth-card">
+        <div class="auth-tabs" role="tablist" aria-label="Authentication mode">
+          <button id="signupTab" class="active" type="button">Sign up</button>
+          <button id="signinTab" type="button">Sign in</button>
+        </div>
+
+        <form id="signupForm" class="auth-form">
+          <label>Full name<input id="signupName" required placeholder="Ayesha Khan" autocomplete="name" /></label>
+          <label>Email<input id="signupEmail" required type="email" placeholder="you@example.com" autocomplete="email" /></label>
+          <label>Password<input id="signupPassword" required type="password" minlength="6" placeholder="At least 6 characters" autocomplete="new-password" /></label>
+          <label>Course or degree<input id="signupCourse" required placeholder="BS Computer Science" /></label>
+          <label>Semester<input id="signupSemester" required placeholder="Semester 5" /></label>
+          <label>Study goal<input id="signupGoal" required placeholder="Prepare for networking midterm" /></label>
+          <button class="primary-button large" type="submit">Create dashboard</button>
+        </form>
+
+        <form id="signinForm" class="auth-form hidden">
+          <label>Email<input id="signinEmail" required type="email" placeholder="you@example.com" autocomplete="email" /></label>
+          <label>Password<input id="signinPassword" required type="password" placeholder="Your password" autocomplete="current-password" /></label>
+          <button class="primary-button large" type="submit">Open dashboard</button>
+          <p id="authMessage" class="muted">Use an email and password you signed up with on this device.</p>
+        </form>
+
+        <button id="backHomeBtn" class="ghost-button" type="button">Back to home</button>
+      </section>
+    </div>
+
+    <div id="app" class="app-shell hidden">
+      <aside class="sidebar" aria-label="Primary">
+        <div class="brand">
+          <div class="brand-mark">SB</div>
+          <div>
+            <strong>StudyBuddy AI</strong>
+            <span id="sidebarUser">Student workspace</span>
+          </div>
+        </div>
+
+        <nav class="nav-list">
+          <button class="nav-item active" data-view="dashboard" title="Dashboard"><span>H</span> Dashboard</button>
+          <button class="nav-item" data-view="upload" title="Upload notes"><span>U</span> Upload</button>
+          <button class="nav-item" data-view="summary" title="Summary"><span>S</span> Summary</button>
+          <button class="nav-item" data-view="quiz" title="Quiz"><span>Q</span> Quiz</button>
+          <button class="nav-item" data-view="flashcards" title="Flashcards"><span>F</span> Flashcards</button>
+          <button class="nav-item" data-view="chat" title="Ask notes"><span>A</span> Ask</button>
+          <button class="nav-item" data-view="planner" title="Study planner"><span>P</span> Planner</button>
+        </nav>
+
+        <div class="sidebar-panel">
+          <label for="noteSelect">Active lecture</label>
+          <select id="noteSelect"></select>
+          <button id="demoDataBtn" class="ghost-button" type="button">Load demo lecture</button>
+          <button id="deleteAccountBtn" class="ghost-button danger-text" type="button">Delete my data</button>
+          <button id="signOutBtn" class="ghost-button danger-text" type="button">Sign out</button>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <button id="menuBtn" class="icon-button mobile-only" title="Open menu" type="button">Menu</button>
+          <div>
+            <p class="eyebrow" id="profileLine">Personal dashboard</p>
+            <h1 id="pageTitle">Dashboard</h1>
+          </div>
+          <div class="top-actions">
+            <button id="themeBtn" class="icon-button" title="Toggle theme" type="button">Mode</button>
+            <button id="settingsBtn" class="icon-button" title="AI settings" type="button">AI</button>
+          </div>
+        </header>
+
+        <section id="dashboard" class="view active">
+          <div class="welcome-band">
+            <div>
+              <p class="eyebrow">Welcome back</p>
+              <h2 id="welcomeTitle">Ready to study?</h2>
+              <p id="welcomeGoal"></p>
+            </div>
+            <button class="primary-button" data-jump="upload" type="button">Upload lecture</button>
+          </div>
+
+          <div class="metrics-grid">
+            <article class="metric"><span>Total lectures</span><strong id="metricNotes">0</strong></article>
+            <article class="metric"><span>Quizzes taken</span><strong id="metricQuizzes">0</strong></article>
+            <article class="metric"><span>Flashcards</span><strong id="metricCards">0</strong></article>
+            <article class="metric"><span>Nearest exam</span><strong id="metricExam">--</strong></article>
+          </div>
+
+          <div class="split-layout">
+            <section class="panel">
+              <div class="section-head">
+                <div>
+                  <p class="eyebrow">Library</p>
+                  <h2>Your uploaded lectures</h2>
+                </div>
+                <button class="secondary-button" data-jump="upload" type="button">Add file</button>
+              </div>
+              <div id="notesList" class="notes-list empty-state"></div>
+            </section>
+
+            <section class="panel">
+              <div class="section-head">
+                <div>
+                  <p class="eyebrow">Today</p>
+                  <h2>AI study plan</h2>
+                </div>
+                <button class="secondary-button" data-jump="planner" type="button">Plan</button>
+              </div>
+              <div id="todayPlan" class="timeline empty-state"></div>
+            </section>
+          </div>
+        </section>
+
+        <section id="upload" class="view">
+          <div class="upload-zone" id="dropZone">
+            <input id="fileInput" type="file" accept=".pdf,.txt,.docx,.pptx,.png,.jpg,.jpeg,.webp,.bmp,.gif" multiple />
+            <div class="upload-icon">UP</div>
+            <h2>Drop PDF, Word, PPT, TXT, or image files here</h2>
+            <p>StudyBuddy extracts readable text and image text where possible, then stores it only inside your password-protected profile on this device.</p>
+            <button class="primary-button" type="button" id="pickFileBtn">Choose files</button>
+          </div>
+          <div id="uploadStatus" class="status-line"></div>
+        </section>
+
+        <section id="summary" class="view">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">AI summary</p>
+              <h2 id="summaryTitle">Summary</h2>
+            </div>
+            <div class="button-row">
+              <button id="generateSummaryBtn" class="primary-button" type="button">Generate</button>
+              <button id="copySummaryBtn" class="secondary-button" type="button">Copy</button>
+              <button id="downloadSummaryBtn" class="secondary-button" type="button">Download</button>
+            </div>
+          </div>
+          <div id="summaryOutput" class="reader empty-state"></div>
+        </section>
+
+        <section id="quiz" class="view">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Practice</p>
+              <h2>MCQ quiz</h2>
+            </div>
+            <button id="generateQuizBtn" class="primary-button" type="button">Generate quiz</button>
+          </div>
+          <div id="quizOutput" class="quiz-box empty-state"></div>
+        </section>
+
+        <section id="flashcards" class="view">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Active recall</p>
+              <h2>Flashcards</h2>
+            </div>
+            <button id="generateCardsBtn" class="primary-button" type="button">Generate cards</button>
+          </div>
+          <div id="flashcardOutput" class="flashcard-stage empty-state"></div>
+        </section>
+
+        <section id="chat" class="view">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Voice Ask</p>
+              <h2>Lecture assistant</h2>
+            </div>
+            <div class="button-row">
+              <button id="voiceAskBtn" class="secondary-button" type="button">Start voice</button>
+              <button id="clearChatBtn" class="secondary-button" type="button">Clear</button>
+            </div>
+          </div>
+          <div id="voiceStatus" class="voice-status">Voice assistant answers only from the selected lecture.</div>
+          <div id="chatLog" class="chat-log empty-state"></div>
+          <form id="chatForm" class="chat-form">
+            <input id="chatInput" type="text" placeholder="Ask something from the selected lecture..." autocomplete="off" />
+            <button class="primary-button" type="submit">Ask</button>
+          </form>
+        </section>
+
+        <section id="planner" class="view">
+          <div class="planner-layout">
+            <form id="plannerForm" class="panel planner-form">
+              <div>
+                <p class="eyebrow">AI planning</p>
+                <h2>Plan a subject</h2>
+              </div>
+              <label>Subject<input id="subjectName" required placeholder="Data Structures" /></label>
+              <label>Exam date<input id="examDate" required type="date" /></label>
+              <label>Daily study time<input id="dailyHours" required type="number" min="1" max="8" value="2" /></label>
+              <button class="primary-button" type="submit">Generate study plan</button>
+            </form>
+            <section class="panel">
+              <div class="section-head">
+                <div>
+                  <p class="eyebrow">Schedule</p>
+                  <h2>Day-by-day plan</h2>
+                </div>
+                <button id="clearPlanBtn" class="secondary-button" type="button">Reset</button>
+              </div>
+              <div id="plannerOutput" class="timeline empty-state"></div>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <dialog id="settingsDialog" class="settings-dialog">
+      <form method="dialog">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Optional AI model</p>
+            <h2>Gemini settings</h2>
+          </div>
+          <button class="icon-button" value="cancel" title="Close" type="submit">Close</button>
+        </div>
+        <p class="muted">Paste a Gemini API key for live AI summaries, quizzes, flashcards, and lecture Q&A. Without a key, local demo generation is used.</p>
+        <label>Gemini API key<input id="apiKeyInput" type="password" placeholder="AIza..." /></label>
+        <menu>
+          <button id="saveApiKeyBtn" class="primary-button" value="default" type="submit">Save</button>
+        </menu>
+      </form>
+    </dialog>
+  </body>
+</html>
